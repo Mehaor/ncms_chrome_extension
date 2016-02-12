@@ -16,8 +16,6 @@ $(document).ready(function() {
         bottom: $('#selector-bottom')
     };
 
-    var offset = 4;
-
     $(document).mousemove(function(event) {
         if(event.target.id.indexOf('selector') !== -1 || event.target.tagName === 'BODY' || event.target.tagName === 'HTML') return;
         var $target = event.target;
