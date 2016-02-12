@@ -1,0 +1,23 @@
+.ncms-selection {
+    background-color: #0000ff;
+}
+
+#selectionRectangle {
+    background-color: #0000ff;
+    position: fixed;
+	transition:all 10ms ease;
+}
+#selector-top, #selector-bottom, #selector-left, #selector-right {
+    background-color: #0000ff;
+    position: fixed;
+	transition:all 100ms ease;
+}
+
+#selector-top, #selector-bottom {
+    height: 2px;
+
+}
+
+#selector-left, #selector-right {
+    width: 2px;
+}
