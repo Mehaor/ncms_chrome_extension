@@ -10,8 +10,14 @@ $(document).ready(function() {
 
     $("body").append('<div id="selector-overlay">' +
         '<h3>Данные</h3>' +
+        '<p>' +
+        '<label for="selector-active">Селектор активен</label>' +
+        '<input type="checkbox" id="selector-active"/>' +
+        '</p>' +
+        '<p>' +
         '<span id="1"></span>' +
         '<span id="2"</span>' +
+        '</p>' +
         '</div>');
 
     var selectors = {
@@ -22,6 +28,7 @@ $(document).ready(function() {
     };
 
     $(document).mousemove(function(event) {
+        if(!$("#selector-active").is(':checked')) { return; }
         if(event.target.id.indexOf('selector') !== -1 || event.target.tagName === 'BODY' || event.target.tagName === 'HTML') return;
         var $target = event.target;
         var targetOffset = $target.getBoundingClientRect();
@@ -49,38 +56,30 @@ $(document).ready(function() {
             "left": targetOffset.left + targetOffset.width + 1,
             "height": targetOffset.height +3
         });
-        //console.log(targetOffset.top + " " + targetOffset.left);
     });
 
     $(document).click(function(event) {
+        if(!$("#selector-active").is(':checked')) { return; }
         var $target = event.target;
-        console.log(fullPath($target));
-        $("#selector-overlay #1").html(fullPath($target));
-
-        (event.target).style.pointerEvents = 'none';
-        chrome.runtime.sendMessage({type: "msgTarget", trgt: "hello"});
-
-
-        return false;
-
+        if ($target.id != "selector-active") {
+            $("#selector-overlay #1").html(getSelectorSequence($target));
+            (event.target).style.pointerEvents = 'none';
+            return false;
+        }
     });
 
-    function fullPath(el){
+    function getSelectorSequence(el){
       var names = [];
-      var className = "";
       while (el.parentNode){
           if (el==el.ownerDocument.documentElement) names.unshift(el.tagName);
           else {
-              for (var c=1,e=el;e.previousElementSibling;e=e.previousElementSibling,c++) {
-                  className = "";
-                  if (el.className) className = "." + el.className.className.split(' ')[0];
-                  names.unshift(el.tagName + className );
-              }
-
+              var className = "";
+              if (el.className) className = "." + el.className.split(' ')[0];
+              names.unshift(el.tagName + className );
           }
           el=el.parentNode;
       }
-      return names.join(" > ");
+      return names.join(" ");
     }
 
 
