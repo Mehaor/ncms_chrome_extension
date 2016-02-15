@@ -7,10 +7,20 @@
     position: fixed;
 	transition:all 10ms ease;
 }
+
+#selector-overlay {
+    position: fixed;
+    z-index: 100;
+    background-color: #ccccff;
+    top: 100px;
+    left: 100px;
+}
+
 #selector-top, #selector-bottom, #selector-left, #selector-right {
     background-color: #0000ff;
     position: fixed;
 	transition:all 100ms ease;
+    z-index: 100;
 }
 
 #selector-top, #selector-bottom {

@@ -8,6 +8,11 @@ $(document).ready(function() {
         '<div id="selector-left"></div>' +
         '<div id="selector-right"></div>');
 
+    $("body").append('<div id="selector-overlay">' +
+        '<h3>Данные</h3>' +
+        '<span id="1"></span>' +
+        '<span id="2"</span>' +
+        '</div>');
 
     var selectors = {
         top: $('#selector-top'),
@@ -48,10 +53,35 @@ $(document).ready(function() {
     });
 
     $(document).click(function(event) {
-        console.log(event.target);
+        var $target = event.target;
+        console.log(fullPath($target));
+        $("#selector-overlay #1").html(fullPath($target));
+
         (event.target).style.pointerEvents = 'none';
+        chrome.runtime.sendMessage({type: "msgTarget", trgt: "hello"});
+
+
         return false;
+
     });
+
+    function fullPath(el){
+      var names = [];
+      var className = "";
+      while (el.parentNode){
+          if (el==el.ownerDocument.documentElement) names.unshift(el.tagName);
+          else {
+              for (var c=1,e=el;e.previousElementSibling;e=e.previousElementSibling,c++) {
+                  className = "";
+                  if (el.className) className = "." + el.className.className.split(' ')[0];
+                  names.unshift(el.tagName + className );
+              }
+
+          }
+          el=el.parentNode;
+      }
+      return names.join(" > ");
+    }
 
 
 });

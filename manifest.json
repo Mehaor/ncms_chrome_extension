@@ -7,7 +7,7 @@
 
   "browser_action": {
     "default_icon": "icon.png",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html?popup=true"
   },
 
   "permissions": ["activeTab"],
@@ -16,8 +16,14 @@
     {
       "matches": ["<all_urls>"],
       "js": ["jquery-1.12.0.min.js", "content.js"],
-      "css": ["style.css"]
+      "css": ["style.css"],
+      "run_at": "document_idle"
     }
-  ]
+  ],
+
+  "background": {
+    "persistent": false,
+    "scripts": ["background.js"]
+  }
 }
 
