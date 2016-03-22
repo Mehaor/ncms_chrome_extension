@@ -1,41 +1,41 @@
-/**
- * Created by mk on 12.02.16.
- */
-
 $(document).ready(function() {
 
+    var activated = false;
     var block = {};
 
-    $("body").append('<div id="selector-top">' +
-        '</div><div id="selector-bottom"></div>' +
-        '<div id="selector-left"></div>' +
-        '<div id="selector-right"></div>');
+    try {chrome.storage.local.get("activated", function(result) { activated = result.activated });}
+    catch (e) {}
 
-    $("body").append('<div id="selector-overlay">' +
-        '<h3>Данные</h3>' +
-        '<p>' +
-        '<label for="selector-active">Селектор активен</label>' +
-        '<input type="checkbox" id="selector-active"/>' +
-        '</p>' +
-        '<p>' +
-        '<span id="1"></span>' +
-        '<span id="2"</span>' +
-        '</p>' +
-        '</div>');
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+        activated = request.activated;
+    });
+
+    $("body").append('<div id="selector-top" class="selector-top blue">' +
+        '</div><div id="selector-bottom" class="selector-bottom blue"></div>' +
+        '<div id="selector-left" class="selector-left blue"></div>' +
+        '<div id="selector-right" class="selector-right blue"></div>' +
+        '<div id="selector-selected-top" class="selector-top red">' +
+        '</div><div id="selector-selected-bottom" class="selector-bottom red"></div>' +
+        '<div id="selector-selected-left" class="selector-left red"></div>' +
+        '<div id="selector-selected-right" class="selector-right red"></div>'
+    );
 
     var selectors = {
-        top: $('#selector-top'),
-        left: $('#selector-left'),
-        right: $('#selector-right'),
-        bottom: $('#selector-bottom')
+        top: $('#selector-top'), left: $('#selector-left'), right: $('#selector-right'), bottom: $('#selector-bottom')
+    };
+
+    var selectedSelectors = {
+        top: $('#selector-selected-top'), left: $('#selector-selected-left'),
+        right: $('#selector-selected-right'), bottom: $('#selector-selected-bottom')
     };
 
     $(document).mousemove(function(event) {
-        if(!$("#selector-active").is(':checked')) { return; }
-        if(event.target.id.indexOf('selector') !== -1 || event.target.tagName === 'BODY' || event.target.tagName === 'HTML') return;
-        var $target = event.target;
-        var targetOffset = $target.getBoundingClientRect();
+        if(!activated)  return;
+        updateSelectorFrame(selectors, event.target);
+    });
 
+    function updateSelectorFrame(selectors, target) {
+        var targetOffset = target.getBoundingClientRect();
         selectors.top.css({
            "top": targetOffset.top -1,
             "left": targetOffset.left -1,
@@ -59,21 +59,22 @@ $(document).ready(function() {
             "left": targetOffset.left + targetOffset.width + 1,
             "height": targetOffset.height +3
         });
-    });
+    }
 
     $(document).click(function(event) {
-        if(!$("#selector-active").is(':checked')) { return; }
+        if(!activated)  return;
         var $target = event.target;
-        if ($target.id != "selector-active") {
-            console.clear();
-            var containerSequence = getSelectorSequence($target);
-            block = {
-                "containerSequence": containerSequence,
-                "childElements": getChildElements($target, containerSequence) };
-            (event.target).style.pointerEvents = 'none';
-            console.log(block);
-            return false;
-        }
+
+        updateSelectorFrame(selectedSelectors, $target);
+        var containerSequence = getSelectorSequence($target);
+        block = {
+            "url": window.location.href,
+            "containerSequence": containerSequence,
+            "childElements": getChildElements($target, containerSequence)
+        };
+        chrome.runtime.sendMessage({task: "setBlockData", "block": block});
+
+        return false;
     });
 
     function getChildElements(el, containerSequence) {
@@ -104,7 +105,6 @@ $(document).ready(function() {
         }
         return names.join(" ");
     }
-
 
 });
 

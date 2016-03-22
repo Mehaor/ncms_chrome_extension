@@ -16,18 +16,15 @@
     left: 100px;
 }
 
-#selector-top, #selector-bottom, #selector-left, #selector-right {
-    background-color: #0000ff;
+.selector-top, .selector-bottom, .selector-left, .selector-right {
     position: fixed;
-	transition:all 100ms ease;
+    transition:all 100ms ease;
     z-index: 100;
 }
 
-#selector-top, #selector-bottom {
-    height: 2px;
+.selector-top, .selector-bottom { height: 2px; }
 
-}
+.selector-left, .selector-right { width: 2px; }
 
-#selector-left, #selector-right {
-    width: 2px;
-}
+.blue {background-color: blue}
+.red {background-color: red; }
