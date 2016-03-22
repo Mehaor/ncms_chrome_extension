@@ -3,6 +3,9 @@
  */
 
 $(document).ready(function() {
+
+    var block = {};
+
     $("body").append('<div id="selector-top">' +
         '</div><div id="selector-bottom"></div>' +
         '<div id="selector-left"></div>' +
@@ -62,24 +65,44 @@ $(document).ready(function() {
         if(!$("#selector-active").is(':checked')) { return; }
         var $target = event.target;
         if ($target.id != "selector-active") {
-            $("#selector-overlay #1").html(getSelectorSequence($target));
+            console.clear();
+            var containerSequence = getSelectorSequence($target);
+            block = {
+                "containerSequence": containerSequence,
+                "childElements": getChildElements($target, containerSequence) };
             (event.target).style.pointerEvents = 'none';
+            console.log(block);
             return false;
         }
     });
 
+    function getChildElements(el, containerSequence) {
+        var childElements = [];
+        $(el).children().each(function(i) {
+            var elementHtml = $(this).wrap('<p/>').parent().html();
+            $(this).unwrap();
+            childElements.push({
+                "sequence": getSelectorSequence(this).replace(containerSequence + " ", ""),
+                "element": elementHtml,
+                "text": $(this).text()
+            });
+            childElements = childElements.concat(getChildElements(this, containerSequence));
+        });
+        return childElements;
+    }
+
     function getSelectorSequence(el){
-      var names = [];
-      while (el.parentNode){
-          if (el==el.ownerDocument.documentElement) names.unshift(el.tagName);
-          else {
-              var className = "";
-              if (el.className) className = "." + el.className.split(' ')[0];
-              names.unshift(el.tagName + className );
-          }
-          el=el.parentNode;
-      }
-      return names.join(" ");
+        var names = [];
+        while (el.parentNode){
+            if (el==el.ownerDocument.documentElement) names.unshift(el.tagName);
+            else {
+                var className = "";
+                if (el.className) className = "." + el.className.split(' ')[0];
+                names.unshift(el.tagName + className );
+            }
+            el=el.parentNode;
+        }
+        return names.join(" ");
     }
 
 
