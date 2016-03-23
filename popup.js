@@ -27,6 +27,18 @@ $(document).ready(function() {
         if (block == null || block === undefined) return;
         $("#blockUrl").text(block.url);
         $("#blockContainerSequence").text(block.containerSequence);
-        $("#blockChildElements").text(block.childElements);
+        //$("#blockChildElements").text(block.childElements);
+        $("#blockSuggestedInfoLink").html(block.suggestedInfo.link.href + "<p>" +
+            block.suggestedInfo.link.sequence + "<p>" +
+            block.suggestedInfo.link.textLink
+        );
+        $("#blockSuggestedInfoTitle").html(block.suggestedInfo.title.sequence + "<p>" +
+            block.suggestedInfo.title.textTitle
+        );
     }
+
+    $("#buttonSave").click(function() {
+        if (block == null || block === undefined) return;
+        localStorage.setItem("ncmsParseOptions", block);
+    });
 });

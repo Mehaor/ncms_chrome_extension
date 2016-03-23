@@ -62,19 +62,21 @@ $(document).ready(function() {
     }
 
     $(document).click(function(event) {
-        if(!activated)  return;
-        var $target = event.target;
+        if(activated) {
+            var $target = event.target;
 
-        updateSelectorFrame(selectedSelectors, $target);
-        var containerSequence = getSelectorSequence($target);
-        block = {
-            "url": window.location.href,
-            "containerSequence": containerSequence,
-            "childElements": getChildElements($target, containerSequence)
-        };
-        chrome.runtime.sendMessage({task: "setBlockData", "block": block});
+            updateSelectorFrame(selectedSelectors, $target);
+            var containerSequence = getSelectorSequence($target);
+            block = {
+                "url": window.location.href,
+                "containerSequence": containerSequence,
+                "childElements": getChildElements($target, containerSequence),
+                "suggestedInfo": getSuggestedInfo($target, containerSequence)
+            };
+            chrome.runtime.sendMessage({task: "setBlockData", "block": block});
+            localStorage.setItem("ncmsParseOptions", block);
 
-        return false;
+        }
     });
 
     function getChildElements(el, containerSequence) {
@@ -90,6 +92,35 @@ $(document).ready(function() {
             childElements = childElements.concat(getChildElements(this, containerSequence));
         });
         return childElements;
+    }
+
+    function getSuggestedInfo(el, containerSequence) {
+        var suggestedInfo = {};
+        $(el).children().each(function(i) {
+            if (this.tagName == 'A') {
+                suggestedInfo.link = {
+                    "href": this.href,
+                    "textLink": $(this).text(),
+                    "sequence": getSelectorSequence(this).replace(containerSequence + " ", "")
+                };
+                suggestedInfo.title = {
+                    "sequence": getTitleSequence(this, containerSequence),
+                    "textTitle": $(this).text()
+                };
+                return false;
+            }
+            suggestedInfo = getSuggestedInfo(this, containerSequence);
+            if (!$.isEmptyObject(suggestedInfo)) return false;
+        });
+        return suggestedInfo;
+    }
+
+    function getTitleSequence(el, containerSequence) {
+        var sequence = getSelectorSequence(el).replace(containerSequence + " ", "");
+        $(el).children().each(function() {
+            sequence = getTitleSequence(this, containerSequence);
+        });
+        return sequence;
     }
 
     function getSelectorSequence(el){
